@@ -1,4 +1,6 @@
 git --version
+git config --global user.name "ИМЯ"
+git congig --global user.email "EMAIL"
 git init
 git add . - зафиксировать все изменения
 git add имя_файла - зафиксировать новый/измененный файл
