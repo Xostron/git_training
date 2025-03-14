@@ -20,3 +20,7 @@ git stash -
 git remote add origin https://github.com/Xostron/git_training.git привязка к удаленному гиту
 git push -u origin master - отправка изменений ветки master впервые
 git push отправка изменений последующие
+
+git checkout -- test2.txt отменить изменения в фалйе (все будет удалено)
+git reset HEAD test2.txt отменить добавление git add
+git commit -amend -m "Изменить комментарий" изменить последний коммит (если он еще не отправлен на удлаенные репо - не запушен)
