@@ -1,0 +1,4 @@
+git --version
+git init
+git add имя_файла
+git commit -m "комментарий"
