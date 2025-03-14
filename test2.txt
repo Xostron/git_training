@@ -2,3 +2,6 @@ git --version
 git init
 git add имя_файла
 git commit -m "комментарий"
+
+git checkout main переключиться обратно на основную ветку
+git merge test-2 выполнить слияние двух веток
