@@ -17,3 +17,6 @@ master
 переключились на ветку master добавили изменения и обратно на test-2 добавили изменения
 переключиться на другую ветки неразрешено, пока есть незакоммиченные изменения или не сохраненные git stash
 git stash - 
+git remote add origin https://github.com/Xostron/git_training.git привязка к удаленному гиту
+git push -u origin master - отправка изменений ветки master впервые
+git push отправка изменений последующие
