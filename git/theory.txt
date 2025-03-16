@@ -72,3 +72,10 @@ git rebase --continue
 Важно: не используйте rebase если ветки уже опубликованы
 тест 1 ветка master
 тест 1 branch feature
+
+Подмодули - Включить другой репозиторий в проект (общие библиотеки)
+git submodule add https://github.com/username/repo.git path_to_submodule подключить к проекту библиотеку из другого репо
+git clone --recurse-submodules https://github.com/username/repo.git клонировать проект с подмодулями
+git submodule update --remote обновить Подмодули
+
+git hook - хуки хранятся в папке юgit/hooks
