@@ -67,7 +67,7 @@ git add -p - поэтапное добавление блоков изменен
 
 Rebase - История коммитов (объединение коммитов)
 git checkout branch-1 
-git rebase main выполнить в ветке branch-1, объедтнение коммитов
+git rebase main выполнить в ветке branch-1, объединение коммитов
 git rebase --continue
 Важно: не используйте rebase если ветки уже опубликованы
 тест 1 ветка master
