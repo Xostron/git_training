@@ -78,4 +78,9 @@ git submodule add https://github.com/username/repo.git path_to_submodule под�
 git clone --recurse-submodules https://github.com/username/repo.git клонировать проект с подмодулями
 git submodule update --remote обновить Подмодули
 
-git hook - хуки хранятся в папке юgit/hooks
+git hook - хуки хранятся в папке .git/hooks
+
+git bisect start поиск забагованного коммита
+git bisect bad Текущий коммит содержит баг
+git bisect good Текущий коммит ОК
+git bisect reset Завершить поиск
