@@ -50,8 +50,8 @@ var twoSum = function (nums, target) {
 	return []
 }
 
-const nums = [2, 7, 11, 15],
-	target = 9
+const nums = [-3,4,3,90],
+	target = 0
 console.log('Result', twoSum(nums, target))
 
 
