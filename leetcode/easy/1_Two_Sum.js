@@ -22,27 +22,31 @@ Output: [0,1]
 */
 
 /**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
+ * @param {number[]} nums массив чисел
+ * @param {number} target цель
+ * @return {number[]} результат индексы 2х чисел, сумма элементов массива = цели
  */
 var twoSum = function (nums, target) {
 	let idx = 0
 	// По числам
 	for (const el of nums) {
-		// число больше - пропускаем
+		// число больше цели - пропускаем
 		if (el > target) continue
 
 		// последнее число из массива выходим из цикла
 		if (idx >= nums.length - 1) break
 
-		// Выбранное число - суммируем с соседними числами
+		// Выбранное число el - суммируем с соседними числами (по соседним)
 		for (let i = idx + 1; i < nums.length; i++) {
+            // больше цели - пропускаем
 			if (nums[i] > target) continue
+            // = цели возвращаем (* цикл и внешний цикл тут же завершаются)
 			if (el + nums[i] === target) return [idx, i]
 		}
+        // Соседние числа с выбранным не дали результата
 		idx++
 	}
+    // нет походящих чисел
 	return []
 }
 
