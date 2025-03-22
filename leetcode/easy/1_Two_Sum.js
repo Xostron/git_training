@@ -22,6 +22,7 @@ Output: [0,1]
 */
 
 /**
+ * Сложность O(N2) - N количество элементов в массиве, 2 - количество вложенных циклов
  * @param {number[]} nums массив чисел
  * @param {number} target цель
  * @return {number[]} результат индексы 2х чисел, сумма элементов массива = цели
@@ -38,20 +39,51 @@ var twoSum = function (nums, target) {
 
 		// Выбранное число el - суммируем с соседними числами (по соседним)
 		for (let i = idx + 1; i < nums.length; i++) {
-            // больше цели - пропускаем
-			if (nums[i] > target) continue
-            // = цели возвращаем (* цикл и внешний цикл тут же завершаются)
+			// = цели возвращаем (* цикл и внешний цикл тут же завершаются)
 			if (el + nums[i] === target) return [idx, i]
 		}
-        // Соседние числа с выбранным не дали результата
+		// Соседние числа с выбранным не дали результата
 		idx++
 	}
-    // нет походящих чисел
+	// нет походящих чисел
 	return []
 }
 
-const nums = [-3,4,3,90],
-	target = 0
+/**
+ * Улучшение: сложность O(N) -
+ * Метод двух указателей
+ *
+ * @param {*} nums
+ * @param {*} target
+ * @returns
+ */
+var twoSum2 = function (nums, target) {
+    // Преобразование массива с индексами, Сортировка
+	const arr = nums.map((el, i) => [el, i]).sort((a, b) => a[0] - b[0])
+	let l = 0,
+    r = nums.length - 1
+    // Поиск методом двух указателей
+    while (true) {
+        // Указатели равны - ничего не найдено
+        if (r==l) return []
+		const sum = arr[l][0] + arr[r][0]
+        // больше, сдвигаем правй указатель
+		if (sum > target) {
+			r--
+			continue
+		}
+        // Меньше, сдвигаем левый указатель
+		if (sum < target) {
+			l++
+			continue
+		}
+        // Сумма = цели
+		return [arr[l][1], arr[r][1]]
+	}
+}
+
+const nums = [-3, 4, 4, 90],
+	nums1 = [2, 7, 11, 15]
+target = 0
 console.log('Result', twoSum(nums, target))
-
-
+console.log('Result2', twoSum2(nums, target))
