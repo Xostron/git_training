@@ -40,3 +40,8 @@ function reverse(obj, next, prev, idCur = 0, limit) {
 
 reverse(list)
 console.log('Result', JSON.stringify(list))
+
+
+function findCycle(obj){
+
+}
