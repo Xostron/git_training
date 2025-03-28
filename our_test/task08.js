@@ -94,6 +94,29 @@ const result = [
 							},
 						],
 					},
+					{
+						codeScheme: 'Scheme 2',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+						],
+					},
+				],
+			},
+			{
+				codeInstance: 'Instance 2',
+				schemes: [
+					{
+						codeScheme: 'Scheme 1',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+						],
+					},
 				],
 			},
 		],
@@ -163,6 +186,7 @@ function data() {
 function transform(data) {
 	return data.reduce((acc, el, i) => {
 		const { codePlatform, codeInstance, codeScheme, codeTable, columns } = el
+
 		const platform = acc.find((p) => p.codePlatform === codePlatform)
 		// Не найдена платформа - создаем новую
 		if (!platform) acc.push(def.platform(el))
@@ -170,12 +194,12 @@ function transform(data) {
 			// Платформа найдена - ищем instance
 			const instance = platform.instances.find((p) => p.codeInstance === codeInstance)
 			// Не найден instance - создаем новый instance
-			if (!instance) def.instance(el)
+			if (!instance) platform.instances.push(def.instance(el))
 			else {
 				// Найден instance - ищем схему
 				const scheme = instance.schemes.find((p) => p.codeScheme === codeScheme)
 				// Не найден scheme - создаем схему
-				if (!scheme) def.scheme(el)
+				if (!scheme) instance.schemes.push(def.scheme(el))
 				else {
 					// Найдена схема - добавляем таблицу
 					scheme.tables.push(def.table(el))
