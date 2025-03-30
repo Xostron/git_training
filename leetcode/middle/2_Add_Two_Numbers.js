@@ -46,40 +46,45 @@ var addTwoNumbers = function (l1, l2) {
 /**
  * Рекурсия: Получить число из связанного списка
  * @param {object} list Связанный список
- * @param {number[]} arr Массив чисел 
+ * @param {number[]} arr Массив чисел
  * @returns {number} Совокупное число из массива
  */
 function getLN(list, arr = []) {
-    // Выход из рекурсии: Если элемент последний, добавляем в аккумулятор и возвращаем аккумулятор-число
+	// Выход из рекурсии: Если элемент последний, добавляем в аккумулятор и возвращаем аккумулятор-число
 	if (!list.next) {
 		arr.push(list.val)
 		return +arr.reverse().join('')
 	}
-    // Остальные элементы - вход в рекурсию
+	// Остальные элементы - вход в рекурсию
 	arr.push(list.val)
 	getLN(list.next, arr)
-    // Возврат из рекурсии = число
+	// Возврат из рекурсии = число
 	return +arr.reverse().join('')
 }
 
 /**
  * Получить связанный список из массива чисед
- * @param {*} arr 
- * @param {*} obj 
- * @returns 
+ * @param {*} arr
+ * @param {*} obj
+ * @returns
  */
 function transformLN(arr, obj = {}) {
-    // Условие выхода из рекурсии: Для массивов с длиной = 1 или последний элемент - возвращаем последний связанный элемент
+	// Условие выхода из рекурсии: Для массивов с длиной = 1 или последний элемент - возвращаем последний связанный элемент
 	if (arr.length <= 1) return { val: +arr[0], next: null }
-    // Все остальные связанные элементы
+	// Все остальные связанные элементы
 	for (let i = 0; i < arr.length; i++) {
-        // Фиксируем val
+		// Фиксируем val
 		obj.val = arr[i]
-        // Оставшая часть элементов массива
+		// Оставшая часть элементов массива
 		const a = arr.slice(i + 1, arr.length)
-        // связь:>1 вход в рекурсию, <=1 последний элемент без связи
-		obj.next = a.length >= 1 ? transformLN(a) : { val: arr[i + 1], next: null }
-        // Возврат из рекурсии
+		// связь:>1 вход в рекурсию, <=1 последний элемент без связи
+		obj.next = a.length >= 1 ? transformLN(a) : { val: +arr[i + 1], next: null }
+		// Возврат из рекурсии
 		return obj
 	}
 }
+
+console.log(
+	'Result',
+	addTwoNumbers({ val: 2, next: { val: 4, next: { val: 3, next: null } } }, { val: 5, next: { val: 6, next: { val: 4, next: null } } })
+)
