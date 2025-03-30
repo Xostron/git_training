@@ -23,47 +23,53 @@ Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
 Output: [8,9,9,9,0,0,0,1]
 
  */
+
 /**
- * @param {ListNode} l1
- * @param {ListNode} l2
- * @return {ListNode}
+ * Definition for singly-linked list.
+
  */
-var addTwoNumbers = function (l1, l2) {
-	let r = (getLN(l1) + getLN(l2)).toString()
-	console.log(111, JSON.stringify(l1), r, typeof r)
-
-	r =
-		r.length > 1
-			? r
-					.split('')
-					.reverse()
-					.map((el) => +el)
-			: [r]
-	r = transformLN(r)
-	return r
+function ListNode(val, next) {
+	this.val = (val === undefined ? 0 : val)
+	this.next = next === undefined ? null : next
 }
-
 /**
  * Рекурсия: Получить число из связанного списка
- * @param {object} list Связанный список
- * @param {number[]} arr Массив чисел
- * @returns {number} Совокупное число из массива
+ * @param {listNode} list Связанный список
+ * @param {string} acc Массив чисел
+ * @returns {string} Число
  */
-function getLN(list, arr = []) {
-	// Выход из рекурсии: Если элемент последний, добавляем в аккумулятор и возвращаем аккумулятор-число
+function getLN(list, acc = '') {
+	// Выход из рекурсии: конец связного списка
 	if (!list.next) {
-		arr.push(list.val)
-		return +arr.reverse().join('')
+		acc += list.val
+		return acc
 	}
 	// Остальные элементы - вход в рекурсию
-	arr.push(list.val)
-	getLN(list.next, arr)
-	// Возврат из рекурсии = число
-	return +arr.reverse().join('')
+	acc += list.val
+	return getLN(list.next, acc)
 }
 
 /**
- * Получить связанный список из массива чисед
+ * Сложение строк как чисел (для обработки больших чисел, > bigInt (10e16))
+ * @param {string} s1
+ * @param {string} s2
+ * @return {number[]} сумма чисел в виде массива
+ */
+function sum(s1, s2) {
+	let sum = []
+	let aux = 0
+	const length = s1.length > s2.length ? s1.length : s2.length
+	for (let i = 0; i < length; i++) {
+		const s = +(s1[i] ?? 0) + +(s2[i] ?? 0) + aux
+		aux = Math.trunc(s / 10)
+		sum.push(s % 10)
+	}
+	aux ? sum.push(aux) : null
+	return sum
+}
+
+/**
+ * Получить связанный список из массива чисел
  * @param {*} arr
  * @param {*} obj
  * @returns
@@ -84,7 +90,122 @@ function transformLN(arr, obj = {}) {
 	}
 }
 
-console.log(
-	'Result',
-	addTwoNumbers({ val: 2, next: { val: 4, next: { val: 3, next: null } } }, { val: 5, next: { val: 6, next: { val: 4, next: null } } })
-)
+/**
+ * Сумма
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var addTwoNumbers = function (l1, l2) {
+	let r = sum(getLN(l1), getLN(l2))
+	return transformLN(r)
+}
+
+const a1 = {
+	1: { val: 2, next: { val: 4, next: { val: 9, next: null } } },
+	2: { val: 5, next: { val: 6, next: { val: 4, next: { val: 9, next: null } } } },
+}
+const a2 = {
+	1: {
+		val: 1,
+		next: {
+			val: 0,
+			next: {
+				val: 0,
+				next: {
+					val: 0,
+					next: {
+						val: 0,
+						next: {
+							val: 0,
+							next: {
+								val: 0,
+								next: {
+									val: 0,
+									next: {
+										val: 0,
+										next: {
+											val: 0,
+											next: {
+												val: 0,
+												next: {
+													val: 0,
+													next: {
+														val: 0,
+														next: {
+															val: 0,
+															next: {
+																val: 0,
+																next: {
+																	val: 0,
+																	next: {
+																		val: 0,
+																		next: {
+																			val: 0,
+																			next: {
+																				val: 0,
+																				next: {
+																					val: 0,
+																					next: {
+																						val: 0,
+																						next: {
+																							val: 0,
+																							next: {
+																								val: 0,
+																								next: {
+																									val: 0,
+																									next: {
+																										val: 0,
+																										next: {
+																											val: 0,
+																											next: {
+																												val: 0,
+																												next: {
+																													val: 0,
+																													next: {
+																														val: 0,
+																														next: {
+																															val: 0,
+																															next: {
+																																val: 1,
+																																next: null,
+																															},
+																														},
+																													},
+																												},
+																											},
+																										},
+																									},
+																								},
+																							},
+																						},
+																					},
+																				},
+																			},
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	2: { val: 5, next: { val: 6, next: { val: 4, next: null } } },
+}
+const a3 = new ListNode(1, null)
+let a4 = a3
+a4.next=new ListNode(2)
+a4 = a4.next
+a4.next = new ListNode(3, 1)
+console.log('Result', JSON.stringify(addTwoNumbers(a2[1], a2[2])))
+console.log(111,a3, a3.val)

@@ -20,6 +20,7 @@ Notice that the answer must be a substring, "pwke" is a subsequence and not a su
 */
 
 /**
+ * 1 решение
  * @param {string} s
  * @return {number}
  */
@@ -39,15 +40,58 @@ var lengthOfLongestSubstring = function (s) {
 		// Набор меньше предыдущего
 		cur = el
 	})
-    console.log(s, result, result.length)
-    return result.length
+	console.log(s, result, result.length)
+	return result.length
 }
 
+/**
+ * Оптимизация мое решение
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLongestSubstring = function (s) {
+	let r = ''
+	let cur = ''
+	for (let i = 0; i < s.length; i++) {
+		const k = cur.indexOf(s[i])
+        // Повторяющийся символ
+		if (k>=0) {
+            // Сохраняем предыдущий результат
+			if (cur.length > r.length) result = cur
+            // вырезаем подстроку от найденного символа
+			cur = cur.slice(k + 1, cur.length)
+		}
+        // сохраняем
+        cur += s[i]
+		if (cur.length > r.length) r = cur
+	}
+	return r.length
+}
 
-const s = "abcabcbb"
-const s1 = "bbbbb"
-const s2 = "pwwkew"
+/**
+ * Чужое решение
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLongestSubstring1 = function (s) {
+	let set = new Set()
+	let left = 0
+	let maxLength = 0
+	for (let right = 0; right < s.length; right++) {
+		while (set.has(s[right])) {
+			set.delete(s[left])
+			left++
+		}
+		set.add(s[right])
+		maxLength = Math.max(maxLength, right - left + 1)
+	}
 
-lengthOfLongestSubstring(s)
-lengthOfLongestSubstring(s1)
-lengthOfLongestSubstring(s2)
+	return maxLength
+}
+
+const s = '   '
+const s1 = 'abcb'
+const s2 = 'pwwkew'
+
+console.log('result', lengthOfLongestSubstring(s))
+
