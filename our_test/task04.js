@@ -79,21 +79,26 @@ const array = [
 function transform(array) {
 	const r = []
 	array.forEach((obj) => {
-		const data = Object.entries(obj)
-		data.forEach(([key, a1]) => {
+		Object.entries(obj).forEach(([key, a1]) => {
 			const rr = {}
-			rr[key] = []
-			a1.forEach((o) => {
-				rr[key].push(...Object.keys(o))
-			})
+            rr[key] = a1.flatMap(o=>Object.keys(o))
 			r.push(rr)
 		})
 	})
 	return r
 }
+const pack = (data) => data.flatMap((o) => Object.entries(o).map(([year, d]) => ({ [year]: d.flatMap((v) => Object.keys(v)) })))
 
+
+
+console.time('b')
+const rr = pack(array)
+console.timeEnd('b')
+
+console.time('a')
 const r = transform(array)
+console.timeEnd('a')
+
+console.log(444, rr)
 console.log(333, r)
 
-
-const pack = data => data.flatMap(o => Object.entries(o).map(([year, d]) => ({ [year]: d.flatMap(v => Object.keys(v)) })));

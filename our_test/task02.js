@@ -83,3 +83,71 @@ console.time('data1')
 const rr = data1(p)
 console.timeEnd('data1')
 console.log('data1', rr)
+
+const rrr = [
+	{
+		codePlatform: 'Platform 1',
+		instances: [
+			{
+				codeInstance: 'Instance 1',
+				schemes: [
+					{
+						codeScheme: 'Scheme 1',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+							{
+								codeTable: 'Table 2',
+								columns: [],
+							},
+						],
+					},
+					{
+						codeScheme: 'Scheme 2',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+						],
+					},
+				],
+			},
+			{
+				codeInstance: 'Instance 2',
+				schemes: [
+					{
+						codeScheme: 'Scheme 1',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	},
+	{
+		codePlatform: 'Platform 2',
+		instances: [
+			{
+				codeInstance: 'Instance 1',
+				schemes: [
+					{
+						codeScheme: 'Scheme 1',
+						tables: [
+							{
+								codeTable: 'Table 1',
+								columns: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	},
+]
