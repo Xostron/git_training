@@ -96,70 +96,79 @@
 // 	// Совпадение
 // 	return true
 // }
+
+var isMatch = function (s, p) {
+    const rr =simple(s,p)
+    if (rr!==undefined) return rr
+	const cursor = { s: { start: 0, end: s.length - 1 }, p: { start: 0, end: p.length - 1 } }
+	let obj = { val: new Array(s.length).fill(null), type: 'start' }
+	middlew(s, p, cursor, obj)
+	// Обработка строки по шаблону завершена obj.val:string[] => string
+	const result = obj.val.filter((el) => el).join('')
+	console.log(999, result, s, p)
+	return result === s ? true : false
+}
+
+function simple(s,p){
+    if (s===p) return true
+    const isSimple = !p.includes('*') && !p.includes('?')
+    if (isSimple){
+        if (s===p) return true
+        else return false
+    }
+}
+
 function determine(character) {
 	const type = character === '*' ? 'star' : character === '?' ? 'query' : 'character'
 	return def[type]
 }
-
-var isMatch = function (s, p) {
-	const cursor = { s: { start: 0, end: s.length }, p: { start: 0, end: p.length } }
-	let obj = { val: new Array(s.length).fill(null), type: 'start' }
-
-	while (obj.val.length < s.length) {
-		// Анализ символа шаблона
-		const check = determine(p[cursor.p[obj.type]])
-		// Проверка символа не прошла - не соответсвие
-		if (!check(s, p, cursor, obj)) {
-			console.log(9999, [obj, s])
-			return false
-		}
-	}
-	console.log(999, [obj, s])
-}
-
-function middlew(s,p,cursor,obj){
-	while(true){
-		const check = determine(p[cursor.p[obj.type]])
-		if (!check(s, p, cursor, obj)) {
-			console.log(9999, [obj, s])
-			return false
-		}
-	}
-
-}
-
 const def = {
 	star(s, p, cursor, obj) {
-		// одна и таже звездочка в начале и в конце
+		console.log(3333)
+		// 1. одна и таже звездочка в начале и в конце
 		if (cursor.p.start === cursor.p.end) {
 			obj.val[cursor.s.start] = s.slice(cursor.s.start, cursor.s.end + 1)
 			cursor.s.end = cursor.s.start
 			return true
 		}
-		// Разные звездочки
-		if (cursor.p.start !== cursor.p.end) {
-			// TODO искать символы внутри звездочек
+		// 2. Разные звездочки
+		if (cursor.p.start !== cursor.p.end && obj.type == 'end') {
+			// искать символы внутри звездочек
 			obj.type = 'start'
 			cursor.p.start++
 			cursor.p.end--
-			// Подготовка (поиск до первого вхождения элемента)
-			
+			// Подготовка (поиск до первого вхождения элемента, если не найдено то выход! (совпадений не найдено))
+			if (!prepare(s, p, cursor, obj)) return false
 			middlew(s, p, cursor, obj)
 			return true
 		}
-		// проверка 1 звездочка - в начале ИЛИ в конце (переключаемся со звездочки на другой курсор, те курсоры не изменяем)
+		// 3. Дошли до "*", переходим на star 1.
+		if (cursor.p.start > cursor.p.end) {
+			cursor.p.end++
+			return true
+		}
+		// 4. проверка 1 звездочка - в начале ИЛИ в конце (переключаемся со звездочки на другой курсор, те курсоры не изменяем)
 		obj.type = obj.type === 'start' ? 'end' : 'start'
 		return true
 	},
 	query(s, p, cursor, obj) {
-		console.log(222)
+		console.log(33)
+		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
+		if (obj.type == 'start') {
+			cursor.p[obj.type]++
+			cursor.s[obj.type]++
+		} else {
+			cursor.p[obj.type]--
+			cursor.s[obj.type]--
+		}
+		return true
 	},
 	character(s, p, cursor, obj) {
-		console.log(333)
+		console.log(333, obj, cursor)
 		// Символы не совпадают - не соответсвие
 		if (s[cursor.s[obj.type]] !== p[cursor.p[obj.type]]) return false
 		// Символы совпадают - соответсвие
-		obj.val[cursor.s[obj.type]] += s[cursor.s[obj.type]]
+		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
 		if (obj.type == 'start') {
 			cursor.p[obj.type]++
 			cursor.s[obj.type]++
@@ -170,6 +179,41 @@ const def = {
 		return true
 	},
 }
+function prepare(s, p, cursor, obj) {
+	while (cursor.s.start < cursor.s.end) {
+		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
+		console.log(888, obj, cursor)
+		if (s[cursor.s[obj.type]] === p[cursor.p[obj.type]] || p[cursor.p[obj.type]] === '?') {
+			// Совпадение найдено
+			cursor.p[obj.type]++
+			cursor.s.start++
+			return true
+		}
+		cursor.s.start++
+	}
+	// все символы пройдены - совпадений не найдено
+	// console.log(8881)
+	return false
+}
+function middlew(s, p, cursor, obj) {
+	while (true) {
+		console.log(777, obj, cursor)
+		const check = determine(p[cursor.p[obj.type]])
+		// Обработка
+		if (!check(s, p, cursor, obj)) {
+			console.log(9999, [obj, cursor, s])
+			return false
+		}
+		// обработка закончена
+		if (cursor.s.start === cursor.s.end) {
+			if (s.length === p.length) {
+				const check = determine(p[cursor.p[obj.type]])
+				check(s, p, cursor, obj)
+			}
+			return
+		}
+	}
+}
 const a1 = { 1: 'adceb', 2: '*a*b' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
 const a3 = { 1: 'aa', 2: '*' } // true
@@ -177,10 +221,12 @@ const a4 = { 1: 'cb', 2: '?c' } // false
 const a5 = { 1: 'aab', 2: 'c*a*b' } // false 1407
 const a6 = { 1: 'ab', 2: '?*' } // true
 const a7 = { 1: 'abefcdgiescdfimde', 2: 'ab*cd?i*de' } // true
-// console.log('Result', a1, isMatch(a1[1], a1[2]))
-// console.log('Result', a2, isMatch(a2[1], a2[2]))
-// console.log('Result', a3, isMatch(a3[1], a3[2]))
-// console.log('Result', a4, isMatch(a4[1], a4[2]))
-// console.log('Result', a5, isMatch(a5[1], a5[2]))
-// console.log('Result', a6, isMatch(a6[1], a6[2]))
-console.log('Result', a7, isMatch(a7[1], a7[2]))
+const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
+// console.log('Result 1', a1, isMatch(a1[1], a1[2]))
+// console.log('Result 2', a2, isMatch(a2[1], a2[2]))
+// console.log('Result 3', a3, isMatch(a3[1], a3[2]))
+// console.log('Result 4', a4, isMatch(a4[1], a4[2]))
+// console.log('Result 5', a5, isMatch(a5[1], a5[2]))
+// console.log('Result 6', a6, isMatch(a6[1], a6[2]))
+// console.log('Result 7', a7, isMatch(a7[1], a7[2]))
+console.log('Result 8', a8, isMatch(a8[1], a8[2]))
