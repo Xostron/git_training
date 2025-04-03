@@ -180,6 +180,10 @@ const def = {
 	},
 }
 function prepare(s, p, cursor, obj) {
+	// TODO сформировать комбинации (вхождения) и отправить на обработку, сохранить первоначальный obj
+	const subObj = []
+	// Поиск вхождений
+
 	while (cursor.s.start < cursor.s.end) {
 		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
 		console.log(888, obj, cursor)
@@ -213,6 +217,23 @@ function middlew(s, p, cursor, obj) {
 			return
 		}
 	}
+}
+
+function search(s,p,cursor,obj){
+	const subObj = []
+	const desire = 
+	while (cursor.s.start < cursor.s.end) {
+
+	}
+}
+
+function getDesire(s,p,cursor,obj){
+	// строка шаблона - найти букву
+	let pp = p.slice(cursor.p.start,cursor.p.end+1).split('')
+	let desire=pp.find(el=>el!=='*'&&el!=='?')
+	if (!desire) pp.find(el=>el!=='*')
+		return desire
+
 }
 const a1 = { 1: 'adceb', 2: '*a*b' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
