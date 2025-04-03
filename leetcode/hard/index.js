@@ -98,10 +98,10 @@
 // }
 
 var isMatch = function (s, p) {
-    const rr =simple(s,p)
-    if (rr!==undefined) return rr
+	const rr = simple(s, p)
+	if (rr !== undefined) return rr
 	const cursor = { s: { start: 0, end: s.length - 1 }, p: { start: 0, end: p.length - 1 } }
-	let obj = { val: new Array(s.length).fill(null), type: 'start' }
+	let obj = { val: new Array(s.length).fill(null), type: 'start', acc: {} }
 	middlew(s, p, cursor, obj)
 	// Обработка строки по шаблону завершена obj.val:string[] => string
 	const result = obj.val.filter((el) => el).join('')
@@ -109,13 +109,13 @@ var isMatch = function (s, p) {
 	return result === s ? true : false
 }
 
-function simple(s,p){
-    if (s===p) return true
-    const isSimple = !p.includes('*') && !p.includes('?')
-    if (isSimple){
-        if (s===p) return true
-        else return false
-    }
+function simple(s, p) {
+	if (s === p) return true
+	const isSimple = !p.includes('*') && !p.includes('?')
+	if (isSimple) {
+		if (s === p) return true
+		else return false
+	}
 }
 
 function determine(character) {
@@ -219,21 +219,84 @@ function middlew(s, p, cursor, obj) {
 	}
 }
 
-function search(s,p,cursor,obj){
-	const subObj = []
-	const desire = 
-	while (cursor.s.start < cursor.s.end) {
+// Поиск вхождений и Обработка на соответсвие - 1 соответсвующий-> выход
+function search(s, p, cursor, obj) {
+	// Искомое, например "символ" или "?"
+	let desire = getDesire(s, p, cursor, obj)
+	if (!desire) return null
+	// Кол-во вхождений искомого
+	fnAccDesire(s, p, cursor, obj, desire, obj.acc)
+	// Обработка вхождений, первый кто дал соответсвие -> выход в основной цикл
+	for(const idx in obj.acc){
+		for(const sstart of obj.acc[idx].entries){
+			
+		}
 
+		// в конце обработки удалить acc
+	}
+	while (cursor.s.start < cursor.s.end) {}
+}
+
+// Найти кол-во вхождений
+function fnAccDesire(s, p, cursor, obj, desire, acc) {
+	// если искомое не найдено, хз
+	if (!desire) return null
+	// Найдено
+
+	// создаем для вхождения аккумулятор
+	const idx = Object.keys(obj.acc).length
+	acc[idx] = { entries: [], val: '', type: 'start', cursor: { s: { ...cursor.s }, p: { ...cursor.p } } }
+	// ищем кол-во вхождений
+	desire.length > 1 ? find(s, cursor, desire, acc[idx]) : findOne(s, cursor, desire, acc[idx])
+}
+
+function findOne(s, cursor, desire, acc) {
+	// desire='буква'
+	let start = cursor.s.start
+	while (start <= cursor.s.end) {
+		if (s[start] === desire) {
+			acc.entries.push(start)
+			break
+		}
+		start++
 	}
 }
 
-function getDesire(s,p,cursor,obj){
-	// строка шаблона - найти букву
-	let pp = p.slice(cursor.p.start,cursor.p.end+1).split('')
-	let desire=pp.find(el=>el!=='*'&&el!=='?')
-	if (!desire) pp.find(el=>el!=='*')
-		return desire
+function find(s, cursor, desire, acc) {
+	// desire='???буква'
+	const letter = desire.split[''].find((el) => el !== '?')
+	let start = cursor.s.start
+	while (start + desire.length - 1 <= cursor.s.end) {
+		let word = s.slice(start, start + desire.length)
+		if (letter) {
+			if (word.endsWith(letter)) acc.entries.push(start + desire.length - 1)
+		} else return true
+	}
+	return !!acc.entries.length
+}
 
+/**
+ *
+ * @param {*} s
+ * @param {*} p
+ * @param {*} cursor
+ * @param {*} obj
+ * @returns "символ" | "?...символ" | ''
+ */
+function getDesire(s, p, cursor, obj) {
+	// строка шаблона - найти букву
+	let pp = p.slice(cursor.p.start, cursor.p.end + 1).split('')
+	let desire = ''
+	for (const el of pp) {
+		if (el == '*') break
+		if (el == '?') {
+			desire += el
+			continue
+		}
+		desire += el
+		break
+	}
+	return desire
 }
 const a1 = { 1: 'adceb', 2: '*a*b' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
@@ -250,4 +313,4 @@ const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
 // console.log('Result 5', a5, isMatch(a5[1], a5[2]))
 // console.log('Result 6', a6, isMatch(a6[1], a6[2]))
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
-console.log('Result 8', a8, isMatch(a8[1], a8[2]))
+// console.log('Result 8', a8, isMatch(a8[1], a8[2]))
