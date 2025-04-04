@@ -97,7 +97,9 @@
 // 	return true
 // }
 
-var isMatch = function (s, p) {}
+var isMatch = function (s, p) {
+
+}
 
 const a1 = { 1: 'adceb', 2: '*a*b' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
@@ -115,3 +117,10 @@ console.log('Result 1', a1, isMatch(a1[1], a1[2]))
 // console.log('Result 6', a6, isMatch(a6[1], a6[2]))
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
 // console.log('Result 8', a8, isMatch(a8[1], a8[2]))
+const r = true
+const rr=false
+
+
+let str = 'h2'
+const result = str.match(/h2/gi)
+console.log(222,str, result)
