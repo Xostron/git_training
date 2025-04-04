@@ -117,29 +117,11 @@ function data() {
 
 function transform(data) {
 	return data.reduce((acc, el, i) => {
-		// const platform = acc.find((p) => p.codePlatform === codePlatform)
-		// Не найдена платформа - создаем новую
-		// if (!platform) acc.push(def.platform(el))
-		// else {
-		// 	// Платформа найдена - ищем instance
-		// 	const instance = platform.instances.find((p) => p.codeInstance === codeInstance)
-		// 	// Не найден instance - создаем новый instance
-		// 	if (!instance) platform.instances.push(def.instance(el))
-		// 	else {
-		// 		// Найден instance - ищем схему
-		// 		const scheme = instance.schemes.find((p) => p.codeScheme === codeScheme)
-		// 		// Не найден scheme - создаем схему
-		// 		if (!scheme) instance.schemes.push(def.scheme(el))
-		// 		else {
-		// 			// Найдена схема - добавляем таблицу
-		// 			scheme.tables.push(def.table(el))
-		// 		}
-		// 	}
-		// }
 		deep(type, code, el, acc)
 		return acc
 	}, [])
 }
+
 const type = ['codePlatform', 'codeInstance', 'codeScheme', 'codeTable']
 const code = ['platform', 'instance', 'scheme', 'table']
 
@@ -163,12 +145,12 @@ function deep(type, code, el, acc) {
 		}
 		// Поиск i+1
 		curObj = prevObj[code[k] + 's'].find((p) => p[type[k]] === el[type[k]])
-        // Не найден - добавляем в ссылку
+		// Не найден - добавляем в ссылку
 		if (!curObj) {
 			prevObj[code[k] + 's'].push(def[code[k]](el))
 			return
 		}
-        // Определяем новую ссылку
+		// Определяем новую ссылку
 		prevObj = curObj
 	}
 }
@@ -198,3 +180,42 @@ const def = {
 
 const r = transform(data())
 console.log(333, JSON.stringify(r, null, ' '))
+
+function setter(data) {
+	let res = []
+	let plt = null,
+		inst = null,
+		schm = null,
+		tbl = null
+	data = data.sort(
+		(a, b) =>
+			a.codePlatform.localeCompare(b.codePlatform) ||
+			a.codeInstance.localeCompare(b.codeInstance) ||
+			a.codeScheme.localeCompare(b.codeScheme) ||
+			a.codeTable.localeCompare(b.codeTable)
+	)
+	for (const el of data) {
+		if (!plt || plt.codePlatform !== el.codePlatform) {
+			plt = { codePlatform: el.codePlatform, instance: [] }
+			res.push(plt)
+			;(inst = null), (schm = null), (tbl = null)
+		}
+		if (!inst || inst.codeInstance !== el.codeInstance) {
+			inst = { codeInstance: el.codeInstance, schemes: [] }
+			plt.instance.push(inst)
+			;(schm = null), (tbl = null)
+		}
+		if (!schm || schm.codeScheme !== el.codeScheme) {
+			schm = { codeScheme: el.codeScheme, tables: [] }
+			inst.schemes.push(schm)
+			tbl = null
+		}
+		if (!tbl || tbl.codeTable !== el.codeTable) {
+			tbl = { codeTable: el.codeTable, columns: [] }
+			schm.tables.push(tbl)
+		}
+	}
+	console.log(res)
+}
+
+setter(data())
