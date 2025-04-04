@@ -103,9 +103,10 @@ var isMatch = function (s, p) {
 	const cursor = { s: { start: 0, end: s.length - 1 }, p: { start: 0, end: p.length - 1 } }
 	let obj = { val: new Array(s.length).fill(null), type: 'start', acc: {} }
 	middlew(s, p, cursor, obj)
+	console.log(9999)
 	// Обработка строки по шаблону завершена obj.val:string[] => string
 	const result = obj.val.filter((el) => el).join('')
-	console.log(999, result, s, p)
+	// console.log(999, result, s, p)
 	return result === s ? true : false
 }
 
@@ -124,7 +125,7 @@ function determine(character) {
 }
 const def = {
 	star(s, p, cursor, obj) {
-		console.log(3333)
+		// console.log(3333)
 		// 1. одна и таже звездочка в начале и в конце
 		if (cursor.p.start === cursor.p.end) {
 			obj.val[cursor.s.start] = s.slice(cursor.s.start, cursor.s.end + 1)
@@ -138,9 +139,12 @@ const def = {
 			cursor.p.start++
 			cursor.p.end--
 			// Подготовка (поиск до первого вхождения элемента, если не найдено то выход! (совпадений не найдено))
-			if (!prepare(s, p, cursor, obj)) return false
-			middlew(s, p, cursor, obj)
-			return true
+			const r = prepare(s, p, cursor, obj)
+			// console.log(999, r, cursor)
+			return r
+			// if (!prepare(s, p, cursor, obj)) return false
+			// middlew(s, p, cursor, obj)
+			// return true
 		}
 		// 3. Дошли до "*", переходим на star 1.
 		if (cursor.p.start > cursor.p.end) {
@@ -152,7 +156,7 @@ const def = {
 		return true
 	},
 	query(s, p, cursor, obj) {
-		console.log(33)
+		// console.log(33)
 		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
 		if (obj.type == 'start') {
 			cursor.p[obj.type]++
@@ -164,11 +168,12 @@ const def = {
 		return true
 	},
 	character(s, p, cursor, obj) {
-		console.log(333, obj, cursor)
+		// console.log(333, obj, cursor)
 		// Символы не совпадают - не соответсвие
 		if (s[cursor.s[obj.type]] !== p[cursor.p[obj.type]]) return false
 		// Символы совпадают - соответсвие
 		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
+		//
 		if (obj.type == 'start') {
 			cursor.p[obj.type]++
 			cursor.s[obj.type]++
@@ -181,23 +186,29 @@ const def = {
 }
 function prepare(s, p, cursor, obj) {
 	// TODO сформировать комбинации (вхождения) и отправить на обработку, сохранить первоначальный obj
-	const subObj = []
+	// const subObj = []
 	// Поиск вхождений
 
-	while (cursor.s.start < cursor.s.end) {
-		obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
-		console.log(888, obj, cursor)
-		if (s[cursor.s[obj.type]] === p[cursor.p[obj.type]] || p[cursor.p[obj.type]] === '?') {
-			// Совпадение найдено
-			cursor.p[obj.type]++
-			cursor.s.start++
-			return true
-		}
-		cursor.s.start++
-	}
+	// while (cursor.s.start < cursor.s.end) {
+	// 	obj.val[cursor.s[obj.type]] = s[cursor.s[obj.type]]
+	// 	// console.log(888, obj, cursor)
+	// 	if (s[cursor.s[obj.type]] === p[cursor.p[obj.type]] || p[cursor.p[obj.type]] === '?') {
+	// 		// Совпадение найдено
+	// 		cursor.p[obj.type]++
+	// 		cursor.s.start++
+	// 		return true
+	// 	}
+	// 	cursor.s.start++
+	// }
 	// все символы пройдены - совпадений не найдено
 	// console.log(8881)
-	return false
+	const r = search(s, p, cursor, obj)
+	if (r) {
+		for (;cursor.p.start<cursor.p.end; cursor.p.start)
+		// console.log(999, r)
+		obj.val = [...r.val]
+	}
+	return r
 }
 function middlew(s, p, cursor, obj) {
 	while (true) {
@@ -205,16 +216,17 @@ function middlew(s, p, cursor, obj) {
 		const check = determine(p[cursor.p[obj.type]])
 		// Обработка
 		if (!check(s, p, cursor, obj)) {
-			console.log(9999, [obj, cursor, s])
+			// console.log(777, cursor)
 			return false
 		}
+		// console.log(9999, cursor)
 		// обработка закончена
-		if (cursor.s.start === cursor.s.end) {
-			if (s.length === p.length) {
-				const check = determine(p[cursor.p[obj.type]])
-				check(s, p, cursor, obj)
-			}
-			return
+		if (cursor.s.start > cursor.s.end) {
+			// if (s.length === p.length) {
+			// 	const check = determine(p[cursor.p[obj.type]])
+			// 	check(s, p, cursor, obj)
+			// }
+			return true
 		}
 	}
 }
@@ -227,14 +239,20 @@ function search(s, p, cursor, obj) {
 	// Кол-во вхождений искомого
 	fnAccDesire(s, p, cursor, obj, desire, obj.acc)
 	// Обработка вхождений, первый кто дал соответсвие -> выход в основной цикл
-	for(const idx in obj.acc){
-		for(const sstart of obj.acc[idx].entries){
-			
+	for (const idx in obj.acc) {
+		for (const sstart of obj.acc[idx].sEntries) {
+			obj.acc[idx].cursor.s = { ...cursor.s }
+			obj.acc[idx].cursor.p = { ...cursor.p }
+			obj.acc[idx].cursor.s.start = sstart
+			console.log(888, sstart, obj.acc[idx])
+			const r = middlew(s, p, obj.acc[idx].cursor, obj.acc[idx])
+			console.log(8888, r)
+			if (r) return obj.acc[idx]
 		}
 
 		// в конце обработки удалить acc
 	}
-	while (cursor.s.start < cursor.s.end) {}
+	return false
 }
 
 // Найти кол-во вхождений
@@ -245,7 +263,8 @@ function fnAccDesire(s, p, cursor, obj, desire, acc) {
 
 	// создаем для вхождения аккумулятор
 	const idx = Object.keys(obj.acc).length
-	acc[idx] = { entries: [], val: '', type: 'start', cursor: { s: { ...cursor.s }, p: { ...cursor.p } } }
+	// sEntries = [cursor.s.start]
+	acc[idx] = { sEntries: [], val: new Array(cursor.s.end).fill(null), type: 'start', cursor: { s: { ...cursor.s }, p: { ...cursor.p } } }
 	// ищем кол-во вхождений
 	desire.length > 1 ? find(s, cursor, desire, acc[idx]) : findOne(s, cursor, desire, acc[idx])
 }
@@ -255,8 +274,8 @@ function findOne(s, cursor, desire, acc) {
 	let start = cursor.s.start
 	while (start <= cursor.s.end) {
 		if (s[start] === desire) {
-			acc.entries.push(start)
-			break
+			acc.sEntries.push(start)
+			// break
 		}
 		start++
 	}
@@ -269,10 +288,10 @@ function find(s, cursor, desire, acc) {
 	while (start + desire.length - 1 <= cursor.s.end) {
 		let word = s.slice(start, start + desire.length)
 		if (letter) {
-			if (word.endsWith(letter)) acc.entries.push(start + desire.length - 1)
+			if (word.endsWith(letter)) acc.sEntries.push(start + desire.length - 1)
 		} else return true
 	}
-	return !!acc.entries.length
+	return !!acc.sEntries.length
 }
 
 /**
@@ -306,7 +325,7 @@ const a5 = { 1: 'aab', 2: 'c*a*b' } // false 1407
 const a6 = { 1: 'ab', 2: '?*' } // true
 const a7 = { 1: 'abefcdgiescdfimde', 2: 'ab*cd?i*de' } // true
 const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
-// console.log('Result 1', a1, isMatch(a1[1], a1[2]))
+console.log('Result 1', a1, isMatch(a1[1], a1[2]))
 // console.log('Result 2', a2, isMatch(a2[1], a2[2]))
 // console.log('Result 3', a3, isMatch(a3[1], a3[2]))
 // console.log('Result 4', a4, isMatch(a4[1], a4[2]))

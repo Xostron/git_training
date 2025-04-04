@@ -142,6 +142,7 @@ function transform(data) {
 }
 const type = ['codePlatform', 'codeInstance', 'codeScheme', 'codeTable']
 const code = ['platform', 'instance', 'scheme', 'table']
+
 function deep(type, code, el, acc) {
 	// platform
 	let obj = acc.find((p) => p[type[0]] === el[type[0]])
