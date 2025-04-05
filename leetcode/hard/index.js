@@ -99,34 +99,97 @@
 
 var isMatch = function (s, p) {}
 
-// Разбиваем шаблон на интервалы **a**b** = [ '*a*', '*b*' ]
+// Разбиваем шаблон на  интервалы **a**b**:<arrP> = [ '*a*', '*b*' ] || a**b** = [ 'a*', '*b*' ]
 const template = (p) => {
+	// Пустая строка
+	if (!p.length) return []
+	// Строка состоит только из '*'
+	if (p.split('').every((el) => el == '*')) return ['*']
+	// Строга, включающая себя строгие символы
 	return p
 		.split('*')
 		.filter((el) => el)
 		.map((el, i) => {
 			if (!el[0]) return el
 			const idx = p.indexOf(el[0])
-            let sub = el
-			if (p[idx - 1] == '*') sub = '*'+el
-            if (p[idx+el.length]=='*') sub+='*'
+			let sub = el
+			if (p[idx - 1] == '*') sub = '*' + el
+			if (p[idx + el.length] == '*') sub += '*'
 			p = p.slice(idx + el.length)
 			return sub
 		})
 }
 
-// Находим вхождения интервала в тестовой строке: return [[...индексы],..]
+// Находим интервалы вхождений в тестовой строке: return [[...индексы],..]
 function fnEntries(s, arrP) {
-	const entries = arrP.reduce((acc, el, idx) => {
+	return arrP.reduce((acc, el, idx) => {
 		const arr = []
 		while (true) {
-			if (el.startsWith('*')) el = el.slice(1)
-			const find = s.indexOf(el)
-			!find ? arr.push(null) : arr.push(find)
+			const type = fnType(el)
+			const o = def[type](s, el, acc, arr)
+			// Анализ отввета
+			// Полный выход
+			if (o.code == 'finish') return acc
+			if (o.code == 'next') {
+				if (!o.idx) break
+				arr.push(o.idx)
+			}
 		}
+		acc.push(arr)
 		return acc
 	}, [])
 }
+
+// вернуть тип интервала шаблона
+function fnType(el) {
+	// 1. Пустой интервал empty
+	// 2. 1 интервал без звездочек strong
+	// 3. 1 интервал звездочка спереди frwd
+	// 4. 1 интервал звездочка в конце back
+	// 5. 1 итервал звездочка в начале и конце fb
+	// несколько итервалов - комбинация из 3 - 5 пунктов
+	if (el == '') return 'empty'
+	if (!el.includes('*')) return 'strong'
+	if (el.startsWith('*') && el.endsWith('*')) return 'fb'
+	if (el.startsWith('*')) return 'frwd'
+	return 'back'
+}
+
+const def = {
+	/**
+	 *
+	 * @param {string} s тестовая строка
+	 * @param {string} el интервал из шаблона
+	 * @returns {object} code:'finish: все вхождения найдены' | 'next' - начать поиск следующего вхождения
+	 *                   result: true соответсвует
+	 *                   idx: индекс входения в тестовой строке
+	 */
+    // Интервал - Пустая строка
+	empty(s, el, acc) {
+		const o = { code: 'finish', result: false }
+		if (s !== el) return o
+		// совпали
+		o.result = true
+		acc.push(o)
+		return o
+	},
+// Интервал - Состоит только из строгих символов (буква | ?)
+	strong(s, el, acc, arr) {
+        const o = { code: 'finish', result: false }
+        // TODO анализ на a | ?a | a? | ? | ???
+
+		acc.push(o)
+		return o
+	},
+
+	fb(s, el, acc, arr) {
+        const i = typeof arr[arr.length] == 'number' ? arr[arr.length] + 1 : 0
+		const r = s.indexOf(el, i)
+		return { code: 'next', idx: r < 0 ? null : r }
+    },
+}
+
+// const dict = {:''}
 
 function match(s, arrP) {}
 const a1 = { 1: 'adceb', 2: '**a**b**' } // true
@@ -134,7 +197,7 @@ const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
 const a3 = { 1: 'aa', 2: '*' } // true
 const a4 = { 1: 'cb', 2: '?c' } // false
 const a5 = { 1: 'aab', 2: 'c*a*b' } // false 1407
-const a6 = { 1: 'ab', 2: '?*' } // true
+const a6 = { 1: 'ab', 2: '*q*' } // true
 const a7 = { 1: 'abefcdgiescdfimde', 2: 'ab*cd?i*de' } // true
 const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
 // console.log('Result 1', a1, isMatch(a1[1], a1[2]))
@@ -145,7 +208,7 @@ const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
 // console.log('Result 6', a6, isMatch(a6[1], a6[2]))
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
 // console.log('Result 8', a8, isMatch(a8[1], a8[2]))
-console.log('template 8', template(a8[2]), a8[2])
+console.log('template 8', template(a6[2]), a8[2], ['abcdefg'.slice(15 + 1)])
 
 /**
  * строгие - символ | ?
@@ -153,3 +216,7 @@ console.log('template 8', template(a8[2]), a8[2])
  * 1) найти интервалы со строгими символами
  * 2) в тестовой строке искать только интервалы по порядку
  */
+
+
+
+
