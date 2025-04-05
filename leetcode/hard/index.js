@@ -97,11 +97,39 @@
 // 	return true
 // }
 
-var isMatch = function (s, p) {
+var isMatch = function (s, p) {}
 
+// Разбиваем шаблон на интервалы **a**b** = [ '*a*', '*b*' ]
+const template = (p) => {
+	return p
+		.split('*')
+		.filter((el) => el)
+		.map((el, i) => {
+			if (!el[0]) return el
+			const idx = p.indexOf(el[0])
+            let sub = el
+			if (p[idx - 1] == '*') sub = '*'+el
+            if (p[idx+el.length]=='*') sub+='*'
+			p = p.slice(idx + el.length)
+			return sub
+		})
 }
 
-const a1 = { 1: 'adceb', 2: '*a*b' } // true
+// Находим вхождения интервала в тестовой строке: return [[...индексы],..]
+function fnEntries(s, arrP) {
+	const entries = arrP.reduce((acc, el, idx) => {
+		const arr = []
+		while (true) {
+			if (el.startsWith('*')) el = el.slice(1)
+			const find = s.indexOf(el)
+			!find ? arr.push(null) : arr.push(find)
+		}
+		return acc
+	}, [])
+}
+
+function match(s, arrP) {}
+const a1 = { 1: 'adceb', 2: '**a**b**' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
 const a3 = { 1: 'aa', 2: '*' } // true
 const a4 = { 1: 'cb', 2: '?c' } // false
@@ -109,7 +137,7 @@ const a5 = { 1: 'aab', 2: 'c*a*b' } // false 1407
 const a6 = { 1: 'ab', 2: '?*' } // true
 const a7 = { 1: 'abefcdgiescdfimde', 2: 'ab*cd?i*de' } // true
 const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
-console.log('Result 1', a1, isMatch(a1[1], a1[2]))
+// console.log('Result 1', a1, isMatch(a1[1], a1[2]))
 // console.log('Result 2', a2, isMatch(a2[1], a2[2]))
 // console.log('Result 3', a3, isMatch(a3[1], a3[2]))
 // console.log('Result 4', a4, isMatch(a4[1], a4[2]))
@@ -117,10 +145,11 @@ console.log('Result 1', a1, isMatch(a1[1], a1[2]))
 // console.log('Result 6', a6, isMatch(a6[1], a6[2]))
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
 // console.log('Result 8', a8, isMatch(a8[1], a8[2]))
-const r = true
-const rr=false
+console.log('template 8', template(a8[2]), a8[2])
 
-
-let str = 'h2'
-const result = str.match(/h2/gi)
-console.log(222,str, result)
+/**
+ * строгие - символ | ?
+ * не строгие - * - пустая строка | строка любого размера
+ * 1) найти интервалы со строгими символами
+ * 2) в тестовой строке искать только интервалы по порядку
+ */
