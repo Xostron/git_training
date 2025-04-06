@@ -164,7 +164,7 @@ const def = {
 	 *                   result: true соответсвует
 	 *                   idx: индекс входения в тестовой строке
 	 */
-    // Интервал - Пустая строка
+	// Интервал - Пустая строка
 	empty(s, el, acc) {
 		const o = { code: 'finish', result: false }
 		if (s !== el) return o
@@ -173,20 +173,31 @@ const def = {
 		acc.push(o)
 		return o
 	},
-// Интервал - Состоит только из строгих символов (буква | ?)
+	// Интервал - Состоит только из строгих символов (буква | ?)
 	strong(s, el, acc, arr) {
-        const o = { code: 'finish', result: false }
-        // TODO анализ на a | ?a | a? | ? | ???
-
+		const o = { code: 'finish', result: false }
+		// TODO анализ на a | ?a | a? | ? | ???
+		if (s.length !== el.length) return o
+		if (!el.split('').every((pp, i) => (pp == '?' || pp == s[i] ? true : false))) return o
+		o.result = true
 		acc.push(o)
 		return o
 	},
 
 	fb(s, el, acc, arr) {
-        const i = typeof arr[arr.length] == 'number' ? arr[arr.length] + 1 : 0
+        const o = { code: 'finish', result: false }
+		const i = typeof arr[arr.length] == 'number' ? arr[arr.length] + 1 : 0
+		// Убрать звездочки
+		el = el.slice(1, el.length - 1)
+        for(let idx=0; idx<el.length; idx++){
+            if (el[idx]=='?') continue
+            const idxs = s.indexOf(el[idx])
+            // if (idxs<0)  
+        }
+        
 		const r = s.indexOf(el, i)
 		return { code: 'next', idx: r < 0 ? null : r }
-    },
+	},
 }
 
 // const dict = {:''}
@@ -208,7 +219,7 @@ const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
 // console.log('Result 6', a6, isMatch(a6[1], a6[2]))
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
 // console.log('Result 8', a8, isMatch(a8[1], a8[2]))
-console.log('template 8', template(a6[2]), a8[2], ['abcdefg'.slice(15 + 1)])
+console.log('template 8', template(a6[2]), a8[2], ['abcdefg*'.slice(1, 8)])
 
 /**
  * строгие - символ | ?
@@ -216,7 +227,3 @@ console.log('template 8', template(a6[2]), a8[2], ['abcdefg'.slice(15 + 1)])
  * 1) найти интервалы со строгими символами
  * 2) в тестовой строке искать только интервалы по порядку
  */
-
-
-
-
