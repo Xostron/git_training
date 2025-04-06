@@ -142,7 +142,7 @@ function fnEntries(s, arrP) {
 
 // вернуть тип интервала шаблона
 function fnType(el) {
-	// 1. Пустой интервал empty
+	// 1. 1 Пустой интервал empty
 	// 2. 1 интервал без звездочек strong
 	// 3. 1 интервал звездочка спереди frwd
 	// 4. 1 интервал звездочка в конце back
@@ -176,28 +176,68 @@ const def = {
 	// Интервал - Состоит только из строгих символов (буква | ?)
 	strong(s, el, acc, arr) {
 		const o = { code: 'finish', result: false }
-		// TODO анализ на a | ?a | a? | ? | ???
 		if (s.length !== el.length) return o
+		// анализ на a | ?a | a? | ? | ??? - Если не совпали
 		if (!el.split('').every((pp, i) => (pp == '?' || pp == s[i] ? true : false))) return o
+		// Совпали
 		o.result = true
 		acc.push(o)
 		return o
 	},
-
-	fb(s, el, acc, arr) {
-        const o = { code: 'finish', result: false }
-		const i = typeof arr[arr.length] == 'number' ? arr[arr.length] + 1 : 0
-		// Убрать звездочки
-		el = el.slice(1, el.length - 1)
-        for(let idx=0; idx<el.length; idx++){
-            if (el[idx]=='?') continue
-            const idxs = s.indexOf(el[idx])
-            // if (idxs<0)  
-        }
-        
-		const r = s.indexOf(el, i)
-		return { code: 'next', idx: r < 0 ? null : r }
+	fnTypeStr(el) {
+		const set = new Set(el.split(''))
+		// el состоит только из ?
+		if (set.has('?') && set.size === 1) return 'onlyQ'
+		if (set.has('?')) return 'mixed'
+		return 'onlyA'
 	},
+	// Интервал со звездочкой в начале и в конце
+	fb(s, el, acc, arr) {
+		const o = { code: 'next', result: false }
+		// Позиция на тестовой строке с которой будет производится поиск
+		const i = arr[arr.length] !== undefined ? arr[arr.length] + 1 : 0
+		// Убрать звездочки из интервала
+		el = el.slice(1, el.length - 1)
+		// Поиск подстроки el в тестовой строке s с учетом "?"
+		// onlyQ | onlyA | mixed
+		const type = this.fnTypeStr(el)
+		console.log(111, type)
+		if (type == 'mixed') {
+			// el содержит хотя бы одну букву type = false
+			// 1 найти первую букву в интервале
+			const first = { idx: s.split('').findIndex((el) => el != '?'), val: null }
+			first.val = s[first.idx]
+			// 2 найти эту букву в тестовой строке
+			const test = { idx: s.indexOf(first.val, first.idx) }
+			// 3 относительно  найденной буквы в тесте, slice строки = длине строки интервала
+			test.sub = s.slice(test.idx - first.idx, test.idx + el.length - first.idx)
+			// 4 если подстрока != длине интервала, то переход к следующему поиску
+			if (test.sub.length !== el.length) return { ...o, excluded: [test.idx] }
+			// 5 Найденная подстрока подходит по длине, сверка данной подстроки с интервалом (функция strong)
+			// не соответсвует
+			if (!el.split('').every((pp, i) => (pp == '?' || pp == test.sub[i] ? true : false))) return { ...o, excluded: [test.idx] }
+			// соответсвует
+			return { ...o, result: true, included: [test.idx - first.idx, test.idx + el.length - first.idx - 1] }
+		} else if (type == 'onlyQ') {
+			// el полностью состоит из "?" type = true
+			const test = { idx: i, sub: s.slice(i, i + el.length) }
+			if (test.sub.length !== el.length) return { ...o, excluded: [test.idx] }
+			return { ...o, result: true, included: [i, i + el.length - 1] }
+		} else if (type == 'onlyA') {
+			// el полностью состоит из "букв" type = true
+			const test = { idx: s.indexOf(el[0], i) }
+			test.sub = s.slice(test.idx, el.length)
+			// Не соответствует
+			if (test.sub.length !== el.length || test.sub != el) return { ...o, excluded: [test.idx] }
+			// соответсвует
+			return { ...o, result: true, included: [test.idx, test.idx + el.length - 1] }
+		}
+		// return { code: 'next', idx: r < 0 ? null : r }
+	},
+    // 3. 1 интервал звездочка спереди frwd
+    frwd(s,el,acc,arr){},
+	// 4. 1 интервал звездочка в конце back
+    back(s,el,acc,arr){}
 }
 
 // const dict = {:''}
@@ -220,7 +260,10 @@ const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
 // console.log('Result 7', a7, isMatch(a7[1], a7[2]))
 // console.log('Result 8', a8, isMatch(a8[1], a8[2]))
 console.log('template 8', template(a6[2]), a8[2], ['abcdefg*'.slice(1, 8)])
+const s = '???abcabcabc'
 
+const first = []
+console.log(first[first.length])
 /**
  * строгие - символ | ?
  * не строгие - * - пустая строка | строка любого размера
