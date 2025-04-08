@@ -97,7 +97,28 @@
 // 	return true
 // }
 
-var isMatch = function (s, p) {}
+var isMatch = function (s, p) {
+	// Разбиваем шаблон на интервалы
+	const arrP = template(p)
+	console.log(1111, 'Интервалы шаблона', arrP)
+	// Для каждого интервала (подстрока из шаблона) ищем вхождения в тестовой строке s
+	const variant = fnEntries(s, arrP)
+	console.log(9999, 'Вхождения', variant)
+	// Пытаемся из массива вхождений собрать последовательную цепочку
+	// 1 проверка на отсутствие вхождений
+	for (const key in variant) {
+		// не соответсвует, найден пустой массив
+		if (!variant[key].length) return false
+		if (variant[key].length===1) return true
+	}
+
+	const r = Object.values(variant)
+	console.log('Поиск соответсвия', r)
+	for (let key = r.length - 1; key >= 0; key--) {
+		console.log(key, r[key])
+	}
+	return true
+}
 
 // Разбиваем шаблон на  интервалы **a**b**:<arrP> = [ '*a*', '*b*' ] || a**b** = [ 'a*', '*b*' ]
 function template(p) {
@@ -122,24 +143,35 @@ function template(p) {
 
 // Находим интервалы вхождений в тестовой строке: return [[...индексы],..]
 function fnEntries(s, arrP) {
+	if (arrP.length === 1 && arrP[0] === '*') return { 0: [0] }
 	return arrP.reduce((acc, el, idx) => {
 		const inner = []
 		const included = []
+		let test = 0
 		while (true) {
 			// Позиция на тестовой строке с которой будет производится поис
 			const start =
-				inner[inner.length] === undefined ? 0 : typeof inner[inner.length] == 'number' ? inner[inner.length] : inner[inner.length][0]
+				inner[inner.length - 1] === undefined
+					? 0
+					: typeof inner[inner.length - 1] == 'number'
+					? inner[inner.length - 1] + 1
+					: inner[inner.length - 1][0] + 1
 			// type = empty | strong | fb | frwd | back
 			const type = fnType(el)
-			if (type !== empty && type != strong && s.length - start < el.length - 2) {
+			// Условия выхода
+			if (type !== 'empty' && type != 'strong' && s.length - start < el.length - 2) {
 				break
 			}
+			// Поиск вхождений
 			const o = def[type](s, el, acc, start)
+			// console.log(222, type)
+			// Условия выхода
+			if (o === null) break
 			// Анализ отввета
 			// Полный выход
 			// back
 			if (o.code == 'finish' && o.next === false) {
-				included = null
+				// included = null
 				break
 			}
 			if (o.code == 'finish' && o.next === true) {
@@ -148,7 +180,8 @@ function fnEntries(s, arrP) {
 			}
 			// frwd
 			if (o.code == 'finish' && o.frwd === false) {
-				included = null
+				// included = null
+				// console.log(111, o, el)
 				break
 			}
 			if (o.code == 'finish' && o.frwd === true) {
@@ -157,11 +190,11 @@ function fnEntries(s, arrP) {
 			}
 			// strong | empty
 			if (o.code == 'finish' && o.result === false) {
-				included = null
+				// included = null
 				break
 			}
 			if (o.code == 'finish' && o.result === true) {
-				included = true
+				included.push(o.included)
 				break
 			}
 			// fb
@@ -174,6 +207,10 @@ function fnEntries(s, arrP) {
 					included.push(o.included)
 				}
 			}
+			// console.log(444, start, o)
+			// if (++test > 2) {
+			// 	break
+			// }
 		}
 		acc[idx] = included
 		return acc
@@ -205,6 +242,7 @@ const def = {
 		if (!el.split('').every((pp, i) => (pp == '?' || pp == s[i] ? true : false))) return o
 		// Совпали
 		o.result = true
+		o.included=0
 		return o
 	},
 	fnTypeStr(el) {
@@ -232,6 +270,7 @@ const def = {
 		first.val = el[first.idx]
 		// 2 найти эту букву в тестовой строке
 		const test = { idx: s.indexOf(first.val, start + first.idx) }
+		if (test.idx === -1) return null
 		// 3 относительно  найденной буквы в тесте, slice строки = длине строки интервала
 		test.sub = s.slice(test.idx - first.idx, test.idx + el.length - first.idx)
 		// 4 если подстрока != длине интервала, то переход к следующему поиску
@@ -253,7 +292,9 @@ const def = {
 		// el полностью состоит из "букв" type = true
 		const o = { code: 'next', result: false }
 		const test = { idx: s.indexOf(el[0], start) }
-		test.sub = s.slice(test.idx, el.length)
+		if (test.idx === -1) return null
+		test.sub = s.slice(test.idx, test.idx + el.length)
+		// console.log(331, test, el)
 		// Не соответствует
 		if (test.sub.length !== el.length || test.sub != el) return { ...o, excluded: [test.idx] }
 		// соответсвует
@@ -263,32 +304,36 @@ const def = {
 	frwd(s, el, acc, start) {
 		const o = { code: 'finish', frwd: false }
 		// Убрать звездочки из интервала
-		el = el.slice(1, el.length - 1)
+		el = el.slice(1, el.length)
 		// 1 найти первую букву в интервале
 		const first = { idx: el.split('').findIndex((k) => k != '?'), val: null }
-		first.val = s[first.idx]
+		first.val = el[first.idx]
 		// 2 найти эту букву в тестовой строке с конца
-		const test = { idx: s.indexOf(first.val, s.length - 1 - (el.length - first.idx)) }
+		const test = { idx: s.indexOf(first.val, s.length - (el.length - first.idx)) }
+		if (test.idx === -1) return null
 		// 3 относительно  найденной буквы в тесте, slice строки = длине строки интервала
-		test.sub = s.slice(s.length - 1 - el.length)
+		test.sub = s.slice(s.length - el.length)
+		// console.log(11,el,  test, first)
 		// 4 если подстрока != длине интервала, то переход к следующему поиску
 		if (test.sub.length !== el.length) return o
 		// 5 Найденная подстрока подходит по длине, сверка данной подстроки с интервалом (функция strong)
 		// не соответсвует
 		if (!el.split('').every((pp, i) => (pp == '?' || pp == test.sub[i] ? true : false))) return o
 		// соответсвует
-		return { ...o, frwd: true, included: [s.length - 1 - el.length, s.length - 1] }
+		return { ...o, frwd: true, included: [s.length - el.length, s.length - 1] }
 	},
 	// 4. 1 интервал звездочка в конце back поиск с начала
 	back(s, el, acc, start) {
 		const o = { code: 'finish', next: false }
 		// Убрать звездочки из интервала
-		el = el.slice(1, el.length - 1)
+		el = el.slice(0, el.length - 1)
 		// 1 найти первую букву в интервале
 		const first = { idx: el.split('').findIndex((k) => k != '?'), val: null }
-		first.val = s[first.idx]
+		first.val = el[first.idx]
 		// 2 найти эту букву в тестовой строке
 		const test = { idx: s.indexOf(first.val, 0 + first.idx) }
+		// console.log(333,el, test, first)
+		if (test.idx === -1) return null
 		// 3 относительно  найденной буквы в тесте, slice строки = длине строки интервала
 		test.sub = s.slice(0, el.length)
 		// 4 если подстрока != длине интервала, то переход к следующему поиску
@@ -315,41 +360,20 @@ function fnType(el) {
 	if (el.startsWith('*')) return 'frwd'
 	return 'back'
 }
-// const dict = {:''}
 
-const a1 = { 1: 'adceb', 2: '**a**b**' } // true
+const a1 = { 1: 'adceb', 2: '**a*c*b**' } // true
 const a2 = { 1: 'acdcb', 2: 'a*c?b' } // false
-const a3 = { 1: 'aa', 2: '*' } // true
+const a3 = { 1: 'aa', 2: '??' } // true
 const a4 = { 1: 'cb', 2: '?c' } // false
 const a5 = { 1: 'aab', 2: 'c*a*b' } // false 1407
 const a6 = { 1: 'ab', 2: '*q*' } // true
 const a7 = { 1: 'abefcdgiescdfimde', 2: 'ab*cd?i*de' } // true
-const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // false
-// console.log('Result 1', a1, isMatch(a1[1], a1[2]))
-// console.log('Result 2', a2, isMatch(a2[1], a2[2]))
-// console.log('Result 3', a3, isMatch(a3[1], a3[2]))
-// console.log('Result 4', a4, isMatch(a4[1], a4[2]))
-// console.log('Result 5', a5, isMatch(a5[1], a5[2]))
-// console.log('Result 6', a6, isMatch(a6[1], a6[2]))
-// console.log('Result 7', a7, isMatch(a7[1], a7[2]))
-// console.log('Result 8', a8, isMatch(a8[1], a8[2]))
-console.log('template 8', template(a6[2]), a8[2], ['abcdefg*'.slice(1, 8)])
-
-const data = {
-	test1(a, b) {
-		return a + b
-	},
-	test2(a, b) {
-		const c = this.test1(a, b)
-		console.log(111, c)
-		return c * 10
-	},
-}
-
-console.log(222, data.test2(10, 2))
-/**
- * строгие - символ | ?
- * не строгие - * - пустая строка | строка любого размера
- * 1) найти интервалы со строгими символами
- * 2) в тестовой строке искать только интервалы по порядку
- */
+const a8 = { 1: 'abcabczzzde', 2: '*abc???de*' } // true
+// console.log('Result 1', a1, 'Соответсвует:', isMatch(a1[1], a1[2]))// true
+// console.log('Result 2', a2, 'Соответсвует:', isMatch(a2[1], a2[2])) // false
+console.log('Result 3', a3, 'Соответсвует:', isMatch(a3[1], a3[2])) // true
+// console.log('Result 4', a4,"Соответсвует:", isMatch(a4[1], a4[2]))// false
+// console.log('Result 5', a5,"Соответсвует:", isMatch(a5[1], a5[2]))// false 1407
+// console.log('Result 6', a6,"Соответсвует:", isMatch(a6[1], a6[2]))// true
+// console.log('Result 7', a7,"Соответсвует:", isMatch(a7[1], a7[2]))// true
+// console.log('Result 8', a8,"Соответсвует:", isMatch(a8[1], a8[2]))// true
