@@ -109,7 +109,8 @@ var isMatch = function (s, p) {
 	for (const key in variant) {
 		// не соответсвует, найден пустой массив
 		if (!variant[key].length) return false
-		if (variant[key].length===1) return true
+		// Соответсвует,
+		// if (variant[key].length===1) return true
 	}
 
 	const r = Object.values(variant)
