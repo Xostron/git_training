@@ -1,4 +1,23 @@
 /**
+ * Учитывая входную строку (s) и шаблон (p), реализуйте сопоставление с шаблоном с подстановочными знаками '?' и '*', 
+ * где: '?' соответствует любому отдельному символу. '*' соответствует любой последовательности символов 
+ * (включая пустую последовательность). Сопоставление должно охватывать всю входную строку (не частично).
+ * 
+ * Example 1:
+ * Input: s = "aa", p = "a"
+ * Output: false
+ * Explanation: "a" does not match the entire string "aa".
+ * 
+ * Example 2:
+ * Input: s = "aa", p = "*"
+ * Output: true
+ * Explanation: '*' matches any sequence.
+ * 
+ * Example 3:
+ * Input: s = "cb", p = "?a"
+ * Output: false
+ * Explanation: '?' matches 'c', but the second letter is 'a', which does not match 'b'.
+ * 
  * @param {string} s проверяемая строка на соответсвие шаблону
  * @param {string} p шаблон
  * @return {boolean} true - соответсвует шаблону
@@ -224,7 +243,8 @@ const def = {
 		if (test.sub.length !== el.length) return { ...o, excluded: [test.idx - first.idx, test.idx + el.length - first.idx - 1] }
 		// 5 Найденная подстрока подходит по длине, сверка данной подстроки с интервалом (функция strong)
 		// не соответсвует
-		if (!el.split('').every((pp, i) => (pp == '?' || pp == test.sub[i] ? true : false))) return { ...o, excluded: [test.idx - first.idx, test.idx + el.length - first.idx - 1] }
+		if (!el.split('').every((pp, i) => (pp == '?' || pp == test.sub[i] ? true : false)))
+			return { ...o, excluded: [test.idx - first.idx, test.idx + el.length - first.idx - 1] }
 		// соответсвует
 		return { ...o, result: true, included: [test.idx - first.idx, test.idx + el.length - first.idx - 1] }
 	},
@@ -375,7 +395,7 @@ const a9 = { 1: 'mississippi', 2: '*m??*ss*?i*pi' } // false
 const a10 = { 1: 'mississippi', 2: '*m??*ss*?i*pi' } // false
 // console.log('Result 1', a1, 'Соответсвует:', isMatch(a1[1], a1[2]))// true
 // console.log('Result 2', a2, 'Соответсвует:', isMatch(a2[1], a2[2])) // false
-console.log('Result 3', a3, 'Соответсвует:', isMatch(a3[1], a3[2])) // true
+console.log('Result 3', a3, 'Соответсвует:', isMatch2(a3[1], a3[2])) // true
 // console.log('Result 4', a4,"Соответсвует:", isMatch(a4[1], a4[2]))// false
 // console.log('Result 5', a5, 'Соответсвует:', isMatch(a5[1], a5[2])) // false 1407
 // console.log('Result 6', a6,"Соответсвует:", isMatch(a6[1], a6[2]))// true
@@ -383,38 +403,97 @@ console.log('Result 3', a3, 'Соответсвует:', isMatch(a3[1], a3[2])) 
 // console.log('Result 8', a8, 'Соответсвует:', isMatch(a8[1], a8[2])) // true
 // console.log('Result 9', a9, 'Соответсвует:', isMatch(a9[1], a9[2])) // false
 
-
 // Чье-то решение
 // Чье то решение
-var isMatch2 = function(s, p) {
-    let sIdx = 0, pIdx = 0, starIdx = -1, match = 0;
-    
-    while (sIdx < s.length) {
-        // If characters match or pattern has '?', move both pointers
-        if (pIdx < p.length && (p[pIdx] === '?' || s[sIdx] === p[pIdx])) {
-            sIdx++;
-            pIdx++;
-        }
-        // If pattern has '*', store its position and try matching zero characters first
-        else if (pIdx < p.length && p[pIdx] === '*') {
-            starIdx = pIdx;
-            match = sIdx;
-            pIdx++;
-        }
-        // If mismatch occurs and '*' was encountered before, backtrack to '*' and try matching one more character
-        else if (starIdx !== -1) {
-            pIdx = starIdx + 1;
-            match++;
-            sIdx = match;
-        }
-        // No match found
-        else {
-            return false;
-        }
-    }
+function isMatch2(s, p) {
+	let sIdx = 0,
+		pIdx = 0,
+		starIdx = -1,
+		match = 0
+	let count = 900
+	while (sIdx < s.length) {
+		count++
+		// If characters match or pattern has '?', move both pointers
+		if (pIdx < p.length && (p[pIdx] === '?' || s[sIdx] === p[pIdx])) {
+			console.log(
+				111,
+				count,
+				'? | буква==буква',
+				's[sIdx]=',
+				s[sIdx],
+				'p[pIdx]=',
+				p[pIdx],
+				'sIdx =',
+				sIdx,
+				'pIdx =',
+				pIdx,
+				'starIdx =',
+				starIdx,
+				'match =',
+				match
+			)
+			sIdx++
+			pIdx++
+			console.log(1111, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+		}
+		// If pattern has '*', store its position and try matching zero characters first
+		else if (pIdx < p.length && p[pIdx] === '*') {
+			console.log(
+				222,
+				count,
+				'Звезда',
+				's[sIdx]=',
+				s[sIdx],
+				'p[pIdx]=',
+				p[pIdx],
+				'sIdx =',
+				sIdx,
+				'pIdx =',
+				pIdx,
+				'starIdx =',
+				starIdx,
+				'match =',
+				match
+			)
+			starIdx = pIdx
+			match = sIdx
+			pIdx++
+			console.log(2222, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+		}
+		// If mismatch occurs and '*' was encountered before, backtrack to '*' and try matching one more character
+		else if (starIdx !== -1) {
+			console.log(
+				333,
+				count,
+				'',
+				's[sIdx]=',
+				s[sIdx],
+				'p[pIdx]=',
+				p[pIdx],
+				'sIdx =',
+				sIdx,
+				'pIdx =',
+				pIdx,
+				'starIdx =',
+				starIdx,
+				'match =',
+				match
+			)
+			pIdx = starIdx + 1
+			match++
+			sIdx = match
+			console.log(3333, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+		}
+		// No match found
+		else {
+			console.log(4444, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+			return false
+		}
+	}
 
-    // Ensure remaining characters in pattern are '*' (as '*' can match empty)
-    while (pIdx < p.length && p[pIdx] === '*') pIdx++;
-
-    return pIdx === p.length;
-};
+	// Ensure remaining characters in pattern are '*' (as '*' can match empty)
+	console.log(555, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+	while (pIdx < p.length && p[pIdx] === '*') pIdx++
+	console.log(5555, count, 's[sIdx]=', s[sIdx], 'p[pIdx]=', p[pIdx], 'sIdx =', sIdx, 'pIdx =', pIdx, 'starIdx =', starIdx, 'match =', match)
+	return pIdx === p.length
+}
