@@ -30,21 +30,21 @@ var moveZeroes = function (nums) {
 			continue
 		}
 
-		// нашел 0 - c этой позиции ищем ненулевое число
-		second = first + 1
-		while (second <= nums.length) {
-			if (nums[second] === 0) {
-				second++
-				continue
-			}
-			// Найден меняем местами
-			const temp = nums[second]
-			nums[second] = nums[first]
-			nums[first] = temp
-			first++
-			console.log('hello', nums)
-			break
-		}
+		// // нашел 0 - c этой позиции ищем ненулевое число
+		// second = first + 1
+		// while (second <= nums.length) {
+		// 	if (nums[second] === 0) {
+		// 		second++
+		// 		continue
+		// 	}
+		// 	// Найден меняем местами
+		// 	const temp = nums[second]
+		// 	nums[second] = nums[first]
+		// 	nums[first] = temp
+		// 	first++
+		// 	console.log('hello', nums)
+		// 	break
+		// }
 	}
 
 	return nums
