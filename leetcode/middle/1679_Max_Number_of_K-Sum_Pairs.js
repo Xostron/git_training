@@ -29,9 +29,9 @@
 var maxOperations = function (nums, k) {
 	nums = nums.filter((el) => el < k).sort((a, b) => a - b)
 	let left = 0,
-		right = nums.length-1,
+		right = nums.length - 1,
 		count = 0
-
+	// Two sum - две суммы
 	while (true) {
 		if (left >= right) return count
 		if (nums[left] + nums[right] > k) {
