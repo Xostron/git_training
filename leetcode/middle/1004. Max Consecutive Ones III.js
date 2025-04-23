@@ -28,7 +28,14 @@
  * @param {number} k
  * @return {number}
  */
-var longestOnes = function (nums, k) {}
+var longestOnes = function (nums, k) {
+	let j = 0
+	for (var i = 0; i < nums.length; i++) {
+		if (nums[i] == 0) k--
+		if (k < 0 && nums[j++] == 0) k++
+	}
+	return i - j
+}
 
-console.log(longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2)) //6
+// console.log(longestOnes([1, 1, 1, 0, 0, 0, 0, 0], 2)) //6
 console.log(longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3)) //10
