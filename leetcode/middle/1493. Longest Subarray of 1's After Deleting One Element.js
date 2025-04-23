@@ -44,4 +44,4 @@ var longestSubarray = function (nums) {
 	return i - j - 1
 }
 
-console.log(longestSubarray([1, 1, 1]))
+console.log(longestSubarray([0, 1, 0, 0, 1, 0, 1, 1]))
