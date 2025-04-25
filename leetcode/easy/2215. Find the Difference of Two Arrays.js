@@ -26,8 +26,31 @@
  * @return {number[][]}
  */
 var findDifference = function (nums1, nums2) {
-	
+	const set1 = new Set(nums1)
+	const set2 = new Set(nums2)
+	const r = [[], []]
+	for (const el of set1) if (!set2.has(el)) r[0].push(el)
+	for (const el of set2) if (!set1.has(el)) r[1].push(el)
+	return r
+}
+
+// Новый метод в Set в новой Node v2x
+var findDifference2 = function (nums1, nums2) {
+	const set1 = new Set(nums1)
+	const set2 = new Set(nums2)
+	return [[...set1.difference(set2)], [...set2.difference(set1)]]
+}
+
+// Чуть быстрее
+function findDifference3(nums1, nums2) {
+	const set1 = new Set(nums1)
+	const set2 = new Set(nums2)
+
+	const onlyIn1 = [...set1].filter((num) => !set2.has(num))
+	const onlyIn2 = [...set2].filter((num) => !set1.has(num))
+
+	return [onlyIn1, onlyIn2]
 }
 
 console.log(findDifference([1, 2, 3], [2, 4, 6]))
-// console.log(findDifference([1, 2, 3, 3], [1, 1, 2, 2]))
+console.log(findDifference([1, 2, 3, 3], [1, 1, 2, 2]))
