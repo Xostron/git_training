@@ -51,6 +51,19 @@ var decodeString = function (s) {
 	}
 	return decode()
 }
+
+
+
 console.log(decodeString('3[a]2[bc]'))
 console.log(decodeString('3[a2[c]]'))
 console.log(decodeString('2[abc]3[cd]ef'))
+// aaabcbc
+// accaccacc
+// abcabccdcdcdef
+
+function fac(n) {
+	if (n <= 1) return 1
+	return n * fac(n - 1)
+}
+
+console.log(fac(4))
