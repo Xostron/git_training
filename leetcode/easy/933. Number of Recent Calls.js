@@ -38,13 +38,14 @@ RecentCounter.prototype.ping = function (t) {
 	else {
 		this.count++
 
-		for (let i = 0; i < this.queue.length - 1; i++) {
+		for (let i = this.queue.length - 2; i >= 0; i--) {
 			const interval = this.queue[i]
 			if ((tt[0] >= interval[0] && tt[0] <= interval[1]) || (tt[1] >= interval[0] && tt[1] <= interval[1])) {
 			} else {
-				this.count--
-				this.queue.splice(i, 1)
-				i--
+                console.log(111)
+				this.count -= i + 1
+				this.queue.splice(0, i + 1)
+				break
 			}
 		}
 	}
@@ -57,6 +58,11 @@ RecentCounter.prototype.ping = function (t) {
  * var param_1 = obj.ping(t)
  */
 const obj = new RecentCounter()
+// const p1 = obj.ping(1)
+// const p2 = obj.ping(100)
+// const p3 = obj.ping(3001)
+// const p4 = obj.ping(3002)
+// console.log(obj, p1, p2, p3, p4) = 1 2 3 3
 const p1 = obj.ping(642)
 const p2 = obj.ping(1849)
 const p3 = obj.ping(4921)
