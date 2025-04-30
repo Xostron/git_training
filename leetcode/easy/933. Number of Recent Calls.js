@@ -31,7 +31,7 @@ var RecentCounter = function () {
  * @param {number} t
  * @return {number}
  */
-RecentCounter.prototype.ping = function (t) {
+RecentCounter.prototype.ping1 = function (t) {
 	const tt = [t - 3000, t]
 	this.queue.push(tt)
 	if (this.queue.length < 2) this.count++
@@ -42,7 +42,7 @@ RecentCounter.prototype.ping = function (t) {
 			const interval = this.queue[i]
 			if ((tt[0] >= interval[0] && tt[0] <= interval[1]) || (tt[1] >= interval[0] && tt[1] <= interval[1])) {
 			} else {
-                console.log(111)
+				console.log(111)
 				this.count -= i + 1
 				this.queue.splice(0, i + 1)
 				break
@@ -52,11 +52,24 @@ RecentCounter.prototype.ping = function (t) {
 	return this.count
 }
 
+RecentCounter.prototype.ping = function (t) {
+	this.queue.push(t)
+	while (this.queue[this.count]<t-3000) {
+        this.count++
+    }
+	return this.queue.length-this.count
+}
 /**
  * Your RecentCounter object will be instantiated and called as such:
  * var obj = new RecentCounter()
  * var param_1 = obj.ping(t)
+ * def ping(self, t: int) -> int:
+        self.records.append(t)
+        while self.records[self.start] < t - 3000:
+            self.start += 1
+        return len(self.records) - self.start
  */
+
 const obj = new RecentCounter()
 // const p1 = obj.ping(1)
 // const p2 = obj.ping(100)
