@@ -31,7 +31,7 @@ deleteMiddle({ val: 1, next: { val: 2, next: { val: 3, next: { val: 4, next: { v
 
 
 /**
- * Алгоритм, быстрый и медленный указатель
+ * Алгоритм, быстрый и медленный указатель Two pointers
  * @param {ListNode} head
  * @return {ListNode}
  */
