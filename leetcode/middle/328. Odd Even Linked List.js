@@ -25,33 +25,78 @@
  * @param {ListNode} head
  * @return {ListNode}
  */
-var oddEvenList = function (head) {
+var oddEvenList1 = function (head) {
 	if (!head || !head.next || !head.next?.next) return head
-	let he = JSON.parse(JSON.stringify(head)),
-		ho = JSON.parse(JSON.stringify(head.next)),
+	let he = JSON.parse(JSON.stringify(head.next)),
 		// нечетный
-		even = he,
+		odd = head,
 		// четный
-		odd = ho,
-		pe = even.next,
+		even = he,
+		temp = odd.next,
+		r = temp,
 		last
-	while (even !== null && pe !== null && odd !== null) {
-		even.next = pe.next
-		even = even.next
-		if (even?.next === undefined) break
-		pe.next = even.next
-		pe = pe.next
-		odd.next = pe
+	while (odd !== null && even !== null) {
+		odd.next = temp.next
 		odd = odd.next
-		last = even
-		// console.log(111, JSON.stringify(he), JSON.stringify(ho)) // JSON.stringify(odd, null, ' ')
+		if (odd?.next === undefined) break
+		temp.next = odd.next
+		temp = temp.next
+		even.next = temp
+		even = even.next
+		last = odd
+		console.log(111, JSON.stringify(he), JSON.stringify(r)) // JSON.stringify(even1, null, ' ')
 	}
-	last.next = ho
-	return he
+	last.next = he
+	return head
 }
 
-// console.log(
-// 	222,
-// 	JSON.stringify(oddEvenList({ val: 1, next: { val: 2, next: { val: 3, next: { val: 4, next: { val: 5, next: { val: 6, next: null } } } } } }))
-// )
-console.log(222, JSON.stringify(oddEvenList({ val: 1, next: { val: 2, next: null } })))
+var oddEvenList = function (head) {
+	if (!head || !head.next || !head.next?.next) return head
+	// let he = JSON.parse(JSON.stringify(head.next)),
+	// нечетный
+	let odd = head,
+		// четный
+		// even = he,
+		temp = odd.next,
+		r = temp
+	// last
+	while (odd && temp && temp.next) {
+		odd.next = temp.next
+		odd = odd.next
+		// if (odd?.next === undefined) break
+		temp.next = odd.next
+		temp = temp.next
+		// even.next = temp
+		// even = even.next
+		// last = odd
+		// console.log(111, JSON.stringify(he), JSON.stringify(r)) // JSON.stringify(even1, null, ' ')
+	}
+	odd.next = r
+	return head
+}
+
+console.log(
+	222,
+	JSON.stringify(oddEvenList({ val: 1, next: { val: 2, next: { val: 3, next: { val: 4, next: { val: 5, next: { val: 6, next: null } } } } } }))
+)
+console.log(222, JSON.stringify(oddEvenList({ val: 1, next: { val: 2, next: { val: 3, next: { val: 4, next: { val: 5, next: null } } } } })))
+// console.log(222, JSON.stringify(oddEvenList({ val: 1, next: { val: 2, next: null } })))
+
+// Быстрее решение
+var oddEvenList2 = function (head) {
+	if (!head && !head.next) return head
+
+	let odd = head
+	let even = head.next
+	let evenHead = even
+
+	while (even && even.next) {
+		odd.next = even.next
+		odd = odd.next
+		even.next = odd.next
+		even = even.next
+	}
+
+	odd.next = evenHead
+	return head
+}
