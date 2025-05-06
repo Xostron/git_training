@@ -64,4 +64,18 @@ let tree
 })
 
 console.log(JSON.stringify(tree))
-console.log(maxDepth())
+
+/**
+ * Чужое решение - рекурсия
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth2 = function (root) {
+	if (!root) return 0
+	console.log(root.val||root)
+	let l = maxDepth2(root.left)
+	let r = maxDepth2(root.right)
+	return 1 + Math.max(l, r)
+}
+
+console.log(maxDepth2(tree))
