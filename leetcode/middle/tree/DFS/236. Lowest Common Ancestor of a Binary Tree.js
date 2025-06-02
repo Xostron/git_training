@@ -80,18 +80,20 @@ const root = {
 // 	left: { val: 6 },
 // 	right: { val: 2, left: { val: 7 }, right: { val: 4 } },
 // }
-const p = { val: 1 }
-const q = { val: 8 }
+const p = root.left
+const q = root.right.right
 
-console.log('result', lowestCommonAncestor(root, p, q))
 
 
 var lowestCommonAncestor1 = function(root, p, q) {
     if (!root || root === p || root === q) return root;
 
-    const left = lowestCommonAncestor(root.left, p, q)
-    const right = lowestCommonAncestor(root.right, p, q)
+    const left = lowestCommonAncestor1(root.left, p, q)
+    const right = lowestCommonAncestor1(root.right, p, q)
 
     if (right && left) return root
     return right || left
 };
+
+
+console.log('result', lowestCommonAncestor1(root, p, q))
